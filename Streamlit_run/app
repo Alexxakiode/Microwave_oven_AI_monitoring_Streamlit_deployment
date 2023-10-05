@@ -1,0 +1,67 @@
+import numpy as np
+import pandas as pd
+import streamlit as st
+import pickle
+from microwave_oven_NBmodel import NBmodel, y_pred_NB
+
+
+pickle_in = open("NBmodel.pkl","rb")
+model = pickle.load(pickle_in)
+
+def welcome():
+    return "Welcome All"
+
+def predict_microwave_energy_usage(power):
+    
+    """Let's Verify the Microwave_oven_Energy_usage 
+    This is using docstrings for specifications.
+    ---
+    parameters:  
+      - name: power
+        in: query
+        type: number
+        required: true
+    responses:
+        200:
+            description: The output values
+        
+    """
+   
+    # prediction = NBmodel.predict(power)
+    # prediction = y_pred_NB
+    prediction = NBmodel.predict([[power]])
+    print(prediction)
+    return prediction
+
+
+def main():
+    st.title("Microwave_monitoring")
+    html_temp = """
+    <div style="background-color:tomato;padding:10px">
+    <h2 style="color:white;text-align:center;">Streamlit Microwave_Monitor ML App </h2>
+    </div>
+    """
+    st.markdown(html_temp,unsafe_allow_html=True)
+    # timestamp = st.text_input("Timestamp", "Type Here")
+    power = st.text_input("Power", "Type Here")
+    result=""
+    if st.button("Predict"):
+        # result=predict_microwave_power(timestamp, power)
+        result=predict_microwave_energy_usage(float(power))
+    
+    # try:
+    #     if result[int()] == 0:
+    #         comment = 'Energy usage is low, do not shutdown'
+    #     else:
+    #         comment = 'Energy usage is high, spike a shutdown'
+    # except IndexError:
+    #     print("Index out of range")
+    
+    st.success(f"The Energy_usage output is {result}")
+
+    if st.button("About"):
+        st.text("Let's monitor microwave")
+        st.text("Streamlit microwave monitoring")
+
+if __name__=='__main__':
+    main()
