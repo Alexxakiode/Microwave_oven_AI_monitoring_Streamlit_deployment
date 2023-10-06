@@ -1,4 +1,6 @@
-#Importing basic libraries
+# Enhanced AI-based Monitoring System for Improving Energy Efficiency in Buildings - applicable to Microwave-oven appliance.
+
+# IMPORTING PYTHON LIBRARIES FOR THE PROJECT
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -30,8 +32,6 @@ from sklearn import svm
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 
-
-
 #Evaluation metrics
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score, roc_curve
 from sklearn.metrics import mean_absolute_error,mean_squared_error
@@ -44,36 +44,28 @@ from keras.layers import Dense
 from keras.optimizers import Adam, RMSprop
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
+"""# ***DATA IMPORTATION***"""
 
-#Import dataset
 
 Microwave_1 = pd.read_csv ("micro_wave_oven_147.csv")
-data = Microwave_1.to_dict("records")
+# data = Microwave_1.to_dict("records")
 # print(data)
 
-"""# **DATA EXPLORATION**"""
+DATA ENGINEERING
 
-Microwave_1.info()
+# Microwave_1.info()
 
-Microwave_1.values
+# Microwave_1.values
 
-Microwave_1.nunique(axis=0)
+# Microwave_1.nunique(axis=0)
 
-"""**Resetting the power feature**"""
+# Microwave_1[621327:621362]
 
+# Microwave_1.sort_values(by=['power'], ascending=False)
 
-Microwave_1[621327:621362]
+DATA MANIPULATION, WRANGLING
 
-"""# **DATA PRE-PROCESSING**"""
-
-Microwave_1.sort_values(by=['power'], ascending=False)
-
-"""# **FEATURE ENGINEERING/EXTRACTION**
-
-# DATA MANIPULATION, WRANGLING
-"""
-
-# #Converting the timestamp format from dtype='datetime64[ns, UTC] to dtype='datetime64[ns]  No need for UTC +00.00 since itis not required for analysis
+# Converting the timestamp format from dtype='datetime64[ns, UTC] to dtype='datetime64[ns]  No need for UTC +00.00 since itis not required for analysis
 
 Microwave_1['timestamp'] = pd.to_datetime(Microwave_1['timestamp']).dt.tz_convert(None)
 
@@ -81,14 +73,13 @@ Microwave_1['timestamp'] = pd.to_datetime(Microwave_1['timestamp']).dt.tz_conver
 
 # Microwave_1.head()
 
-"""**DATA FEATURE SELECTION/DATA QUERYING**
+DATA FEATURE SELECTION/DATA QUERYING
 
-### **Exploratory Data Analysis (EDA)** 1
+Exploratory Data Analysis (EDA)
 
 I made some data visualisation to help us understand the relationship of the cleaned dataset
 
 Data Analysis showing the dataset in its original form
-"""
 
 # plot time series
 #Because it has been set to an index, the word Timestamp (GMT) would not be uses, instead Heart_record.index
@@ -133,32 +124,22 @@ Data Analysis showing the dataset in its original form
 # Microwave_1.dtypes
 
 # Converting values in power column from float to integer
-
-# Microwave_1['power'] = Microwave_1['power'].astype(int)
-
-# Power distribution based on the timestamp after the date split
+Microwave_1['power'] = Microwave_1['power'].astype(int)
 
 # # from pandas.io.formats import style
 # plt.figure(figsize=(12, 8))
 # Microwave_1.plot(style='.')
 
-# """# **If we need to set the timestamp as the index**"""
-
 
 
 # Creating a new column based on conditions of the power emitted in "power" column with 2 conditions; low energy usage or medium energy usage
-
 Microwave_1['Energy usage'] = np.where(Microwave_1['power'] < 2 , "low energy", "high energy")
 
 #Converting categorical features to numerical features for classification
-
 Microwave_1['Energy usage'] = Microwave_1['Energy usage'].map({'low energy':0, 'high energy':1})
 
 
-
-"""# **USING BASIC MACHINE LEARNING ALGORITHMS**
-
-"""
+USING BASIC MACHINE LEARNING ALGORITHMS
 
 Microwave_1 = Microwave_1.copy()
 
@@ -170,55 +151,21 @@ y = Microwave_1['Energy usage']
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 
-from sklearn.preprocessing import MinMaxScaler
-from sklearn import preprocessing
-scaler = MinMaxScaler()
 
-scaler.fit(X_train)
-
-scaler.transform(X_train)
-
-X_train_scaled = scaler.transform(X_train)
-
-print(X_train_scaled.mean(axis=0))
-
-print(X_train_scaled.std(axis=0))
-
-
-X_test_scaled = scaler.transform(X_test)
-
-print(X_test_scaled.mean(axis=0))
-
-print(X_test_scaled.std(axis=0))
-
-len(X_train_scaled)
-
-len(X_test_scaled)
-
-# Creating the train_test_split variable after scaling
-
-X_train_scaled, X_test_scaled, y_train, y_test = train_test_split(X_train_scaled, y_train, test_size=0.3, random_state=0)
-
-
-# # To reshape the "power" values from scalar array to a 2D array
-
-# X_train_scaled = np.array(X_train_scaled).reshape(-1, 1) 
-# X_test = np.array(X_test).reshape(-1, 1)
-
-"""Naive Bayes"""
+Naive Bayes Model
 
 from sklearn.naive_bayes import GaussianNB
 
 NBmodel = GaussianNB()
-NBmodel.fit(X_train_scaled,y_train)
+NBmodel.fit(X_train,y_train)
 
 # # Making prediction based on the model
-y_pred_NB = NBmodel.predict(X_test_scaled)
+y_pred_NB = NBmodel.predict(X_test)
 y_pred_NB.shape
 
-# # Reshaping the prediction variable to 2d array
-# y_pred_NB = y_pred_NB.reshape(-1,1)
-# y_pred_NB.shape
+# Reshaping the prediction variable to 2d array
+y_pred_NB = y_pred_NB.reshape(-1,1)
+y_pred_NB.shape
 
 # Evaluating the Gaussian Naive Bayes model
 
@@ -226,40 +173,19 @@ from sklearn import metrics
 acc_score_NB = accuracy_score(y_test, y_pred_NB)
 auc_score_NB= roc_auc_score(y_test, y_pred_NB)
 
-
 print(f"Gaussian Naive Bayes model accuracy score: {acc_score_NB:0.4f} and AUC of {auc_score_NB:0.4f}")
+
 
 # Evaluating using other metrics
 
 print(classification_report(y_test, y_pred_NB))
 
-# # Comparing the prediction and the actual
-# y_pred_NB == y_test
-
-# # This is to be deleted when deploying as it is renaming the variable
-# # Printing samples of the prediction
-# y_pred_NB = NBmodel.predict(X_test[:200])
-# print(y_pred_NB)
-
-# Restore the value to inverse the transform
-X_test_unscaled = scaler.inverse_transform(X_test_scaled)
-
-# # Reshaping the prediction variable to 2d array for deployment
-
-y_pred_NB = NBmodel.predict(X_test_unscaled.reshape(-1,1))
-y_pred_NB.shape
-
-
-# # Reshaping the prediction variable to 2d array
-# y_pred_NB = y_pred_NB.reshape(-1,1)
-# y_pred_NB.shape
-
-# X_test = pd.to_numeric(X_test, errors='coerce')
-# # X_test = pd.to_numeric(X_test)
 
 # Deploying the NB Model
+
 import pickle
 
 pickle_out = open("NBmodel.pkl","wb")
 pickle.dump(NBmodel, pickle_out)
 pickle_out.close()
+
