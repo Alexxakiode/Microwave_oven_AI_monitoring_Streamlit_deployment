@@ -1,0 +1,63 @@
+import numpy as np
+import pandas as pd
+import streamlit as st
+import pickle
+from microwave_oven_NBmodel import NBmodel, y_pred_NB
+
+
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+
+pickle_in = open("NBmodel.pkl","rb")
+model = pickle.load(pickle_in)
+
+def welcome():
+    return "Welcome All"
+
+def predict_microwave_energy_usage(power):
+    
+    """Let's Verify the Microwave_oven_Energy_usage 
+    This is using docstrings for specifications.
+    ---
+    parameters:  
+      - name: power
+        in: query
+        type: number
+        required: true
+    responses:
+        200:
+            description: The output values
+        
+    """
+   
+    # prediction = NBmodel.predict(power)
+    # prediction = y_pred_NB
+    prediction = NBmodel.predict([[power]])
+    print(prediction)
+    return prediction
+
+
+def main():
+    st.title("Microwave_monitoring")
+    html_temp = """
+    <div style="background-color:tomato;padding:10px">
+    <h2 style="color:white;text-align:center;">Streamlit Microwave_Monitor ML App </h2>
+    </div>
+    """
+    st.markdown(html_temp,unsafe_allow_html=True)
+    # timestamp = st.text_input("Timestamp", "Type Here")
+    power = st.text_input("Power(watt)", "Type Here")
+    result=""
+    if st.button("Predict"):
+        result=predict_microwave_energy_usage(float(power))
+
+    st.success(f"The Energy_usage output is {result}")
+   
+    if st.button("Result description"):
+        st.text("Let's monitor microwave")
+        st.text("If power is less 2watts, energy usage is considered low with result=0 and therefore the microwave stays on")
+        st.text("if power is above 2watts, Energy usage is considered high with result=1 and therefore, the system will spike a shutdown to save energy")
+
+if __name__=='__main__':
+    main()
